@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sphrs = "0.2.2"
+scilib = "1.0.0"

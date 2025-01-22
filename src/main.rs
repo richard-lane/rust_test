@@ -1,11 +1,34 @@
+use scilib::quantum::spherical_harmonics;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn main() {
-    println!(
-        "{:?}",
-        load_coefficients("../01/mtmshc_AOHIS_20060101_00.360")
-    );
+    let mut coeffs: Vec<(usize, usize, f64, f64)> =
+        load_coefficients("../01/mtmshc_AOHIS_20060101_00.360");
+
+    coeffs = scale_coeffs(coeffs);
+
+    println!("{:?}", coeffs[1]);
+}
+
+/// Scale the coefficients to the range [-1, 1]
+fn scale_coeffs(mut coeffs: Vec<(usize, usize, f64, f64)>) -> Vec<(usize, usize, f64, f64)> {
+    // Find the coefficients with the largest magnitude
+    let max_c_nm: f64 = coeffs
+        .iter()
+        .map(|(_, _, c_nm, _)| c_nm.abs())
+        .fold(0.0, |a, b| a.max(b));
+    let max_s_nm: f64 = coeffs
+        .iter()
+        .map(|(_, _, _, s_nm)| s_nm.abs())
+        .fold(0.0, |a, b| a.max(b));
+
+    coeffs.iter_mut().for_each(|(_, _, c_nm, s_nm)| {
+        *c_nm /= max_c_nm;
+        *s_nm /= max_s_nm;
+    });
+
+    coeffs
 }
 
 /// Load spherical harmonic coefficients from a file
